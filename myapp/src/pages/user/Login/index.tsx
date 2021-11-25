@@ -1,11 +1,12 @@
 import {
-  AlipayCircleOutlined,
+  //AlipayCircleOutlined,
   LockOutlined,
   MobileOutlined,
-  TaobaoCircleOutlined,
+  //TaobaoCircleOutlined,
   UserOutlined,
-  WeiboCircleOutlined,
+  //WeiboCircleOutlined,
 } from '@ant-design/icons';
+import Axios from 'axios';
 import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { ProFormCaptcha, ProFormCheckbox, ProFormText, LoginForm } from '@ant-design/pro-form';
@@ -48,31 +49,57 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
-      const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
+      var mensagem = '';
+      await Axios.post('http://localhost:5000/login', {
+        email: values.username,
+        password: values.password,
+      }).then((res) => {
+        //console.log(res);
+        localStorage.setItem('token', res.data.token);
+      });
+      const token = localStorage.getItem('token');
+      await Axios.get('http://localhost:5000/isUserAuth', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }).then((res) => {
+        if (res.data.authenticated) {
+          mensagem = 'ok';
+        } else {
+          console.log('User not Authencticated');
+        }
+      });
+      console.log(mensagem);
+
+      if (mensagem === 'ok') {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: 'Sucess！',
         });
-        message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
         if (!history) return;
         const { query } = history.location;
+        console.log(query);
         const { redirect } = query as { redirect: string };
+        //const redirect ="/welcome "
         history.push(redirect || '/');
-        return;
+        console.log(redirect);
+        //message.success(defaultLoginSuccessMessage);
+        console.log(defaultLoginSuccessMessage);
+        //await fetchUserInfo();
       }
-      console.log(msg);
-      setUserLoginState(msg);
+      //console.log(message);
+      //setUserLoginState(message);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
         defaultMessage: 'Failed to login！',
       });
-      message.error(defaultLoginFailureMessage);
+      //message.error(defaultLoginFailureMessage);
+      console.log(defaultLoginFailureMessage);
     }
   };
-  const { status, type: loginType } = userLoginState;
+  //const { status, type: loginType } = userLoginState;
 
   return (
     <div className={styles.container}>
@@ -88,7 +115,7 @@ const Login: React.FC = () => {
             autoLogin: true,
           }}
           actions={[
-            <FormattedMessage key="loginWith" id="pages.login.loginWith" defaultMessage="LogIn" />
+            <FormattedMessage key="loginWith" id="pages.login.loginWith" defaultMessage="LogIn" />,
           ]}
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);
@@ -104,7 +131,7 @@ const Login: React.FC = () => {
             />
           </Tabs>
 
-          {status === 'error' && loginType === 'account' && (
+          {status === 'error' && type === 'account' && (
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.accountLogin.errorMessage',
@@ -161,7 +188,7 @@ const Login: React.FC = () => {
             </>
           )}
 
-          {status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误" />}
+          {status === 'error' && type === 'mobile' && <LoginMessage content="验证码错误" />}
           {type === 'mobile' && (
             <>
               <ProFormText
