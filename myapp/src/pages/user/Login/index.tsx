@@ -10,12 +10,15 @@ import Axios from 'axios';
 import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { ProFormCaptcha, ProFormCheckbox, ProFormText, LoginForm } from '@ant-design/pro-form';
-import { useIntl, history, FormattedMessage, SelectLang, useModel } from 'umi';
+import { useIntl, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 
+import { useHistory,Switch, Route } from "react-router";
+
 import styles from './index.less';
+import Welcome from '@/pages/Welcome';
 
 const LoginMessage: React.FC<{
   content: string;
@@ -33,11 +36,12 @@ const LoginMessage: React.FC<{
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
-
+  //const { initialState, setInitialState } = useModel('@@initialState');
+  let history = useHistory();
   const intl = useIntl();
-
-  const fetchUserInfo = async () => {
+  
+  <Route exact path='/welcome' component={Welcome} />
+  /*const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
     if (userInfo) {
       await setInitialState((s) => ({
@@ -45,7 +49,7 @@ const Login: React.FC = () => {
         currentUser: userInfo,
       }));
     }
-  };
+  };*/
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
@@ -65,29 +69,29 @@ const Login: React.FC = () => {
       }).then((res) => {
         if (res.data.authenticated) {
           mensagem = 'ok';
+          history.push("/welcome");
         } else {
           console.log('User not Authencticated');
         }
       });
       console.log(mensagem);
 
-      if (mensagem === 'ok') {
-        const defaultLoginSuccessMessage = intl.formatMessage({
-          id: 'pages.login.success',
-          defaultMessage: 'Sucess！',
-        });
-        await fetchUserInfo();
-        if (!history) return;
-        const { query } = history.location;
-        console.log(query);
-        const { redirect } = query as { redirect: string };
-        //const redirect ="/welcome "
-        history.push(redirect || '/');
-        console.log(redirect);
-        //message.success(defaultLoginSuccessMessage);
-        console.log(defaultLoginSuccessMessage);
+      const defaultLoginSuccessMessage = intl.formatMessage({
+        id: 'pages.login.success',
+        defaultMessage: 'Sucess！',
+      });
+      /*if (mensagem === 'ok') {
         //await fetchUserInfo();
-      }
+        if (!history) return;
+        //const { query } = history.location;
+        //console.log(query);
+        //const { redirect } = query as { redirect: string };
+        //const redirect ="/welcome "
+        //console.log(redirect);
+        //message.success(defaultLoginSuccessMessage);
+        //await fetchUserInfo();
+      }*/
+      console.log(defaultLoginSuccessMessage);
       //console.log(message);
       //setUserLoginState(message);
     } catch (error) {
