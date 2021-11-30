@@ -1,24 +1,23 @@
 import {
   //AlipayCircleOutlined,
   LockOutlined,
-  MobileOutlined,
+  //MobileOutlined,
   //TaobaoCircleOutlined,
   UserOutlined,
   //WeiboCircleOutlined,
 } from '@ant-design/icons';
 import Axios from 'axios';
-import { Alert, message, Tabs } from 'antd';
+import { Alert, Tabs } from 'antd';
 import React, { useState } from 'react';
-import { ProFormCaptcha, ProFormCheckbox, ProFormText, LoginForm } from '@ant-design/pro-form';
+import {ProFormText, LoginForm } from '@ant-design/pro-form';
 import { useIntl, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { login } from '@/services/ant-design-pro/api';
-import { getFakeCaptcha } from '@/services/ant-design-pro/login';
+//import { login } from '@/services/ant-design-pro/api';
+//import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 
-import { useHistory,Switch, Route } from "react-router";
-
+//import { Switch, Route } from 'react-router';
+import { useHistory} from 'react-router';
 import styles from './index.less';
-import Welcome from '@/pages/Welcome';
 
 const LoginMessage: React.FC<{
   content: string;
@@ -34,14 +33,14 @@ const LoginMessage: React.FC<{
 );
 
 const Login: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [userLoginState, /*setUserLoginState*/] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
-  //const { initialState, setInitialState } = useModel('@@initialState');
+  const { initialState, setInitialState } = useModel('@@initialState');
   let history = useHistory();
   const intl = useIntl();
-  
-  <Route exact path='/welcome' component={Welcome} />
-  /*const fetchUserInfo = async () => {
+
+  //<Route exact path='/welcome' component={Welcome} />
+  const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
     if (userInfo) {
       await setInitialState((s) => ({
@@ -49,7 +48,7 @@ const Login: React.FC = () => {
         currentUser: userInfo,
       }));
     }
-  };*/
+  };
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
@@ -69,7 +68,7 @@ const Login: React.FC = () => {
       }).then((res) => {
         if (res.data.authenticated) {
           mensagem = 'ok';
-          history.push("/welcome");
+          //history.push('/welcome');
         } else {
           console.log('User not Authencticated');
         }
@@ -78,6 +77,46 @@ const Login: React.FC = () => {
 
       const defaultLoginSuccessMessage = intl.formatMessage({
         id: 'pages.login.success',
+        defaultMessage: 'Sucess！',
+      });
+      if (mensagem === 'ok') {
+        await fetchUserInfo();
+        if (!history) return;
+        //const { query } = history.location;
+        //console.log(query);
+        //const { redirect } = query as { redirect: string };
+        //const redirect ="/welcome "
+        //console.log(redirect);
+        //message.success(defaultLoginSuccessMessage);
+        //await fetchUserInfo();
+      }
+      console.log(defaultLoginSuccessMessage);
+      //console.log(message);
+      //setUserLoginState(message);
+    } catch (error) {
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'pages.login.failure',
+        defaultMessage: 'Failed to login！',
+      });
+      //message.error(defaultLoginFailureMessage);
+      console.log(defaultLoginFailureMessage);
+    }
+  };
+
+
+  const handleSubmitRegs = async (values: API.LoginParams) => {
+    try {
+      var mensagem = '';
+      await Axios.post("http://localhost:5000/register", {
+        email: values.username,
+        password: values.password,
+      }).then((res) => {
+        console.log(res);
+      });
+      console.log(mensagem);
+
+      const defaultRegisterSuccessMessage = intl.formatMessage({
+        id: 'pages.register.success',
         defaultMessage: 'Sucess！',
       });
       /*if (mensagem === 'ok') {
@@ -91,19 +130,23 @@ const Login: React.FC = () => {
         //message.success(defaultLoginSuccessMessage);
         //await fetchUserInfo();
       }*/
-      console.log(defaultLoginSuccessMessage);
+      console.log(defaultRegisterSuccessMessage);
       //console.log(message);
       //setUserLoginState(message);
     } catch (error) {
-      const defaultLoginFailureMessage = intl.formatMessage({
-        id: 'pages.login.failure',
-        defaultMessage: 'Failed to login！',
+      const defaultRegisterFailureMessage = intl.formatMessage({
+        id: 'pages.register.failure',
+        defaultMessage: 'Failed to register！',
       });
       //message.error(defaultLoginFailureMessage);
-      console.log(defaultLoginFailureMessage);
+      console.log(defaultRegisterFailureMessage);
     }
-  };
-  //const { status, type: loginType } = userLoginState;
+
+  }
+
+
+
+  const { status, type: loginType } = userLoginState;
 
   return (
     <div className={styles.container}>
@@ -123,6 +166,8 @@ const Login: React.FC = () => {
           ]}
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);
+            console.log(values);
+            
           }}
         >
           <Tabs activeKey={type} onChange={setType}>
@@ -134,8 +179,16 @@ const Login: React.FC = () => {
               })}
             />
           </Tabs>
-
-          {status === 'error' && type === 'account' && (
+          <Tabs activeKey={type} onChange={setType}>
+            <Tabs.TabPane
+              key="register"
+              tab={intl.formatMessage({
+                id: 'pages.register.tab',
+                defaultMessage: 'Register',
+              })}
+            />
+          </Tabs>
+          {status === 'error' && loginType === 'account' && (
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.accountLogin.errorMessage',
@@ -191,87 +244,61 @@ const Login: React.FC = () => {
               />
             </>
           )}
-
-          {status === 'error' && type === 'mobile' && <LoginMessage content="验证码错误" />}
-          {type === 'mobile' && (
+  	      </LoginForm>
+          {status === 'error' && loginType === 'register' && <LoginMessage content="验证码错误" />}
+          {type === 'register' && (
             <>
+              <LoginForm
+                onFinish={async (values) => {
+                  await handleSubmitRegs(values as API.LoginParams);
+                  //console.log(values);
+                }}
+              >
               <ProFormText
+                name="username"
                 fieldProps={{
                   size: 'large',
-                  prefix: <MobileOutlined className={styles.prefixIcon} />,
+                  prefix: <UserOutlined className={styles.prefixIcon} />,
                 }}
-                name="mobile"
                 placeholder={intl.formatMessage({
-                  id: 'pages.login.phoneNumber.placeholder',
-                  defaultMessage: '手机号',
+                  id: 'pages.login.username.placeholder',
+                  defaultMessage: 'Insert: admin or user',
                 })}
                 rules={[
                   {
                     required: true,
                     message: (
                       <FormattedMessage
-                        id="pages.login.phoneNumber.required"
-                        defaultMessage="请输入手机号！"
-                      />
-                    ),
-                  },
-                  {
-                    pattern: /^1\d{10}$/,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.phoneNumber.invalid"
-                        defaultMessage="手机号格式错误！"
+                        id="pages.login.username.required"
+                        defaultMessage="Username!"
                       />
                     ),
                   },
                 ]}
               />
-              <ProFormCaptcha
+              <ProFormText.Password
+                name="password"
                 fieldProps={{
                   size: 'large',
                   prefix: <LockOutlined className={styles.prefixIcon} />,
                 }}
-                captchaProps={{
-                  size: 'large',
-                }}
                 placeholder={intl.formatMessage({
-                  id: 'pages.login.captcha.placeholder',
-                  defaultMessage: '请输入验证码',
+                  id: 'pages.login.password.placeholder',
+                  defaultMessage: 'Password: ant.design',
                 })}
-                captchaTextRender={(timing, count) => {
-                  if (timing) {
-                    return `${count} ${intl.formatMessage({
-                      id: 'pages.getCaptchaSecondText',
-                      defaultMessage: '获取验证码',
-                    })}`;
-                  }
-                  return intl.formatMessage({
-                    id: 'pages.login.phoneLogin.getVerificationCode',
-                    defaultMessage: '获取验证码',
-                  });
-                }}
-                name="captcha"
                 rules={[
                   {
                     required: true,
                     message: (
                       <FormattedMessage
-                        id="pages.login.captcha.required"
-                        defaultMessage="请输入验证码！"
+                        id="pages.login.password.required"
+                        defaultMessage="Password Required！"
                       />
                     ),
                   },
                 ]}
-                onGetCaptcha={async (phone) => {
-                  const result = await getFakeCaptcha({
-                    phone,
-                  });
-                  if (result === false) {
-                    return;
-                  }
-                  message.success('获取验证码成功！验证码为：1234');
-                }}
               />
+            </LoginForm>
             </>
           )}
           <div
@@ -279,18 +306,14 @@ const Login: React.FC = () => {
               marginBottom: 24,
             }}
           >
-            <ProFormCheckbox noStyle name="autoLogin">
-              <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
-            </ProFormCheckbox>
             <a
               style={{
                 float: 'right',
               }}
             >
-              <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
             </a>
           </div>
-        </LoginForm>
+          
       </div>
       <Footer />
     </div>
