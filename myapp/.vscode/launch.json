@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+        "name": "Launch Chrome For Debug",
+        "type": "pwa-msedge",
+        "request": "launch",
+        "url": "http://localhost:8000",
+        "sourceMaps": true,
+        "webRoot": "${workspaceRoot}",
+        "userDataDir": "${workspaceRoot}/.vscode/chrome"
+        }
+        ]
+}

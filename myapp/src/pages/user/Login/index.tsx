@@ -9,14 +9,14 @@ import {
 import Axios from 'axios';
 import { Alert, Tabs } from 'antd';
 import React, { useState } from 'react';
-import {ProFormText, LoginForm } from '@ant-design/pro-form';
+import { ProFormText, LoginForm } from '@ant-design/pro-form';
 import { useIntl, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 //import { login } from '@/services/ant-design-pro/api';
 //import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 
 //import { Switch, Route } from 'react-router';
-import { useHistory} from 'react-router';
+import { useHistory } from 'react-router';
 import styles from './index.less';
 
 const LoginMessage: React.FC<{
@@ -33,7 +33,7 @@ const LoginMessage: React.FC<{
 );
 
 const Login: React.FC = () => {
-  const [userLoginState, /*setUserLoginState*/] = useState<API.LoginResult>({});
+  const [userLoginState /*setUserLoginState*/] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
   let history = useHistory();
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
       }).then((res) => {
         if (res.data.authenticated) {
           mensagem = 'ok';
-          //history.push('/welcome');
+          history.push('/welcome');
         } else {
           console.log('User not Authencticated');
         }
@@ -85,10 +85,10 @@ const Login: React.FC = () => {
         //const { query } = history.location;
         //console.log(query);
         //const { redirect } = query as { redirect: string };
-        //const redirect ="/welcome "
         //console.log(redirect);
         //message.success(defaultLoginSuccessMessage);
-        //await fetchUserInfo();
+        await fetchUserInfo();
+        //history.push('/welcome');
       }
       console.log(defaultLoginSuccessMessage);
       //console.log(message);
@@ -103,11 +103,10 @@ const Login: React.FC = () => {
     }
   };
 
-
   const handleSubmitRegs = async (values: API.LoginParams) => {
     try {
       var mensagem = '';
-      await Axios.post("http://localhost:5000/register", {
+      await Axios.post('http://localhost:5000/register', {
         email: values.username,
         password: values.password,
       }).then((res) => {
@@ -141,10 +140,7 @@ const Login: React.FC = () => {
       //message.error(defaultLoginFailureMessage);
       console.log(defaultRegisterFailureMessage);
     }
-
-  }
-
-
+  };
 
   const { status, type: loginType } = userLoginState;
 
@@ -166,8 +162,7 @@ const Login: React.FC = () => {
           ]}
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);
-            console.log(values);
-            
+            //console.log(values);
           }}
         >
           <Tabs activeKey={type} onChange={setType}>
@@ -244,16 +239,16 @@ const Login: React.FC = () => {
               />
             </>
           )}
-  	      </LoginForm>
-          {status === 'error' && loginType === 'register' && <LoginMessage content="验证码错误" />}
-          {type === 'register' && (
-            <>
-              <LoginForm
-                onFinish={async (values) => {
-                  await handleSubmitRegs(values as API.LoginParams);
-                  //console.log(values);
-                }}
-              >
+        </LoginForm>
+        {status === 'error' && loginType === 'register' && <LoginMessage content="验证码错误" />}
+        {type === 'register' && (
+          <>
+            <LoginForm
+              onFinish={async (values) => {
+                await handleSubmitRegs(values as API.LoginParams);
+                //console.log(values);
+              }}
+            >
               <ProFormText
                 name="username"
                 fieldProps={{
@@ -299,21 +294,19 @@ const Login: React.FC = () => {
                 ]}
               />
             </LoginForm>
-            </>
-          )}
-          <div
+          </>
+        )}
+        <div
+          style={{
+            marginBottom: 24,
+          }}
+        >
+          <a
             style={{
-              marginBottom: 24,
+              float: 'right',
             }}
-          >
-            <a
-              style={{
-                float: 'right',
-              }}
-            >
-            </a>
-          </div>
-          
+          ></a>
+        </div>
       </div>
       <Footer />
     </div>
