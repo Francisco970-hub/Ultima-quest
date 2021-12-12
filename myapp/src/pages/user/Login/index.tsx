@@ -10,7 +10,7 @@ import Axios from 'axios';
 import { Alert, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { ProFormText, LoginForm } from '@ant-design/pro-form';
-import { useIntl, FormattedMessage, SelectLang, useModel } from 'umi';
+import { useIntl, FormattedMessage, history,SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 //import { login } from '@/services/ant-design-pro/api';
 //import { getFakeCaptcha } from '@/services/ant-design-pro/login';
@@ -36,23 +36,31 @@ const Login: React.FC = () => {
   const [userLoginState /*setUserLoginState*/] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
-  let history = useHistory();
+  let hist = useHistory();
   const intl = useIntl();
 
-  //<Route exact path='/welcome' component={Welcome} />
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      await setInitialState((s) => ({
-        ...s,
-        currentUser: userInfo,
-      }));
-    }
+  const fetchUserInfo = async (token) => {
+    //const userInfo = await initialState?.fetchUserInfo?.();
+    await Axios.get('http://localhost:5000/isUserAuth', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }).then(async (res) => {
+        if (res.data.authenticated) {
+          await setInitialState((s) => ({
+            ...s,
+            currentUser: res.data.user,
+            
+          }));
+        } else {
+          console.log('User not Authencticated');
+        }
+      });
   };
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
-      var mensagem = '';
+      //var mensagem = '';
       await Axios.post('http://localhost:5000/login', {
         email: values.username,
         password: values.password,
@@ -61,36 +69,28 @@ const Login: React.FC = () => {
         localStorage.setItem('token', res.data.token);
       });
       const token = localStorage.getItem('token');
-      await Axios.get('http://localhost:5000/isUserAuth', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }).then((res) => {
-        if (res.data.authenticated) {
-          mensagem = 'ok';
-          history.push('/welcome');
-        } else {
-          console.log('User not Authencticated');
-        }
-      });
-      console.log(mensagem);
+
+      
+      //console.log(mensagem);
 
       const defaultLoginSuccessMessage = intl.formatMessage({
         id: 'pages.login.success',
         defaultMessage: 'Sucess！',
       });
-      if (mensagem === 'ok') {
-        await fetchUserInfo();
+      await fetchUserInfo(token);
+      /*if (mensagem === 'ok') {
+        //await fetchUserInfo();
         if (!history) return;
-        //const { query } = history.location;
-        //console.log(query);
-        //const { redirect } = query as { redirect: string };
-        //console.log(redirect);
+        const { query } = history.location;
+        console.log(query);
+        const { redirect } = query as { redirect: string };
         //message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
-        //history.push('/welcome');
-      }
+        //await fetchUserInfo();
+        history.push(redirect || '/');
+        console.log(redirect);
+      }*/
       console.log(defaultLoginSuccessMessage);
+      history.push('welcome' || '/');
       //console.log(message);
       //setUserLoginState(message);
     } catch (error) {
@@ -98,6 +98,8 @@ const Login: React.FC = () => {
         id: 'pages.login.failure',
         defaultMessage: 'Failed to login！',
       });
+      console.log(error);
+      
       //message.error(defaultLoginFailureMessage);
       console.log(defaultLoginFailureMessage);
     }

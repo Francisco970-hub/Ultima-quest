@@ -21,28 +21,29 @@ export const initialStateConfig = {
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  //fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
-  const fetchUserInfo = async () => {
+  /*const fetchUserInfo = async () => {
     try {
       const msg = await queryCurrentUser();
+      console.log(msg.data);
       return msg.data;
     } catch (error) {
+      console.log(error);
       history.push(loginPath);
     }
     return undefined;
-  };
+  };*/
   // 如果是登录页面，不执行
   if (history.location.pathname !== loginPath) {
-    const currentUser = await fetchUserInfo();
+    const currentUser ={ 
+      name:localStorage.getItem('token')}
     return {
-      fetchUserInfo,
       currentUser,
       settings: {},
     };
   }
   return {
-    fetchUserInfo,
     settings: {},
   };
 }
@@ -53,7 +54,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     waterMarkProps: {
-      content: initialState?.currentUser?.name,
+      content: initialState?.currentUser?.email,
     },
     footerRender: () => <Footer />,
     onPageChange: () => {
