@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import { ProFormCaptcha, ProFormCheckbox, ProFormText, LoginForm } from '@ant-design/pro-form';
 import { useIntl, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { login } from '@/services/ant-design-pro/api';
+import { login, validate } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 
 import styles from './index.less';
@@ -49,7 +49,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
+      if (msg.status === 200) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: 'Sucess！',
@@ -63,6 +63,8 @@ const Login: React.FC = () => {
         return;
       }
       console.log(msg);
+      validate(msg.data);
+      //console.log(msg);
       setUserLoginState(msg);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
@@ -88,7 +90,7 @@ const Login: React.FC = () => {
             autoLogin: true,
           }}
           actions={[
-            <FormattedMessage key="loginWith" id="pages.login.loginWith" defaultMessage="LogIn" />
+            <FormattedMessage key="loginWith" id="pages.login.loginWith" defaultMessage="LogIn" />,
           ]}
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);

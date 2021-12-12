@@ -1,6 +1,8 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from 'umi';
+import Axios from 'axios';
+import { useHistory } from 'react-router';
 
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
@@ -22,13 +24,28 @@ export async function outLogin(options?: { [key: string]: any }) {
 
 /** 登录接口 POST /api/login/account */
 export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
-  return request<API.LoginResult>('/api/login/account', {
+  return Axios('http://localhost:5000/login', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+    data: {
+      email: body.username,
+      password: body.password,
     },
-    data: body,
-    ...(options || {}),
+  });
+}
+
+export async function validate(body: API.LoginParams, options?: { [key: string]: any }) {
+  const token = localStorage.getItem('token');
+  return Axios('http://localhost:5000/isUserAuth', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((res) => {
+    if (res.data.authenticated) {
+      console.log('User Authencticated');
+    } else {
+      console.log('User not Authencticated');
+    }
   });
 }
 
