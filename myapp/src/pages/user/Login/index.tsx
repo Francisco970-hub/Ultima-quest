@@ -1,10 +1,10 @@
 import {
-  AlipayCircleOutlined,
+  //AlipayCircleOutlined,
   LockOutlined,
   MobileOutlined,
-  TaobaoCircleOutlined,
+  //TaobaoCircleOutlined,
   UserOutlined,
-  WeiboCircleOutlined,
+  //WeiboCircleOutlined,
 } from '@ant-design/icons';
 import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
@@ -54,8 +54,9 @@ const Login: React.FC = () => {
           id: 'pages.login.success',
           defaultMessage: 'Sucess！',
         });
-        message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
+        console.log(defaultLoginSuccessMessage);
+        //message.success(defaultLoginSuccessMessage);
+        await fetchUserInfo(); //o problema começa aqui com o current user
         if (!history) return;
         const { query } = history.location;
         const { redirect } = query as { redirect: string };
@@ -65,13 +66,14 @@ const Login: React.FC = () => {
       console.log(msg);
       validate(msg.data);
       //console.log(msg);
-      setUserLoginState(msg);
+      //setUserLoginState(msg);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
         defaultMessage: 'Failed to login！',
       });
-      message.error(defaultLoginFailureMessage);
+      console.log(defaultLoginFailureMessage);
+      //message.error(defaultLoginFailureMessage);
     }
   };
   const { status, type: loginType } = userLoginState;
