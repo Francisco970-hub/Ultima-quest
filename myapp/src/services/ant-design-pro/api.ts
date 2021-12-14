@@ -34,7 +34,7 @@ export async function login(body: API.LoginParams, options?: { [key: string]: an
 }
 
 export async function validate(body: API.LoginParams, options?: { [key: string]: any }) {
-  const token = localStorage.getItem('token');
+  const token = /*localStorage.getItem('token')*/ '';
   return Axios('http://localhost:5000/isUserAuth', {
     method: 'GET',
     headers: {
