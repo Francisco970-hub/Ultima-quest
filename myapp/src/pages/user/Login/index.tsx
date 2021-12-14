@@ -38,6 +38,8 @@ const Login: React.FC = () => {
 
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
+    console.log(userInfo);
+
     if (userInfo) {
       await setInitialState((s) => ({
         ...s,
@@ -55,6 +57,7 @@ const Login: React.FC = () => {
           defaultMessage: 'Sucess！',
         });
         console.log(defaultLoginSuccessMessage);
+        console.log(msg);
         //message.success(defaultLoginSuccessMessage);
         await fetchUserInfo(); //o problema começa aqui com o current user
         if (!history) return;
@@ -65,7 +68,6 @@ const Login: React.FC = () => {
       }
       console.log(msg);
       //validate(msg.data);
-      //console.log(msg);
       setUserLoginState(msg);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({

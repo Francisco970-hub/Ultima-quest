@@ -2,16 +2,24 @@
 /* eslint-disable */
 import { request } from 'umi';
 import Axios from 'axios';
-import { useHistory } from 'react-router';
+//import { useHistory } from 'react-router';
 
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
+  console.log('currentuser');
   return request<{
     data: API.CurrentUser;
-  }>('/api/currentUser', {
+  }>('http://localhost:5000/getUser', {
     method: 'GET',
     ...(options || {}),
   });
+
+  /*return request('http://localhost:5000/getUser', {
+    method: 'GET',
+    data: {
+      email: body.username,
+    },
+  });*/
 }
 
 /** 退出登录接口 POST /api/login/outLogin */

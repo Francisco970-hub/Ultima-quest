@@ -92,6 +92,14 @@ app.get("/getUsers", (req, res) => {
   })
 })
 
+app.get("/getUser", (req, res) => {
+  db.query("SELECT email FROM users WHERE email=?",[req.body.username],(err,result) => {
+    console.log("getUser");
+    //console.log(res);
+    res.json({result:result});
+  })
+})
+
 app.get("/getTasks", (req, res) => {
   db.query("SELECT task as title,inicio as start,fim as end FROM tasks",(err,result) => {
     res.json({result:result});
