@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import { ProFormCaptcha, ProFormCheckbox, ProFormText, LoginForm } from '@ant-design/pro-form';
 import { useIntl, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { login, validate } from '@/services/ant-design-pro/api';
+import { getUser, login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 
 import styles from './index.less';
@@ -58,6 +58,10 @@ const Login: React.FC = () => {
         });
         console.log(defaultLoginSuccessMessage);
         console.log(msg);
+
+        const userInfo = await getUser({ ...values, type });
+        console.log(userInfo);
+
         //message.success(defaultLoginSuccessMessage);
         await fetchUserInfo(); //o problema começa aqui com o current user
         if (!history) return;
@@ -68,7 +72,7 @@ const Login: React.FC = () => {
       }
       console.log(msg);
       //validate(msg.data);
-      setUserLoginState(msg);
+      //setUserLoginState(msg);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',

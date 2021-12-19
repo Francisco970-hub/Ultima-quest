@@ -9,6 +9,12 @@ export async function currentUser(options?: { [key: string]: any }) {
   console.log('currentuser');
   return request<{
     data: API.CurrentUser;
+  }>('/api/currentUser', {
+    method: 'GET',
+    ...(options || {}),
+  });
+  /*return request<{
+    data: API.CurrentUser;
   }>('http://localhost:5000/getUser', {
     method: 'GET',
     ...(options || {}),
@@ -27,6 +33,19 @@ export async function outLogin(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/login/outLogin', {
     method: 'POST',
     ...(options || {}),
+  });
+}
+
+export async function getUser(body: API.LoginParams) {
+  console.log(body.username);
+  var resData = {};
+  await Axios.get('http://localhost:5000/getUtilizador', {
+    data: {
+      email: body.username,
+    },
+  }).then((res) => {
+    resData = res.data;
+    return resData;
   });
 }
 

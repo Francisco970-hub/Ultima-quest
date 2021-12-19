@@ -76,6 +76,7 @@ app.post("/login", (req, res) => {
         if (result[0].password === req.body.password) {
           const token = jwt.sign(JSON.stringify(result[0]), "root");
           console.log("User Confirmed");
+          
           console.log(result[0].email);
           res.status(200).send({ token: token });
         } else {
@@ -92,11 +93,17 @@ app.get("/getUsers", (req, res) => {
   })
 })
 
-app.get("/getUser", (req, res) => {
-  db.query("SELECT email FROM users WHERE email=?",[req.body.username],(err,result) => {
-    console.log("getUser");
+app.get("/getUtilizador", (req, res) => {
+  console.log(req.body.email);
+  db.query(
+    "SELECT * FROM users WHERE email = ?"
+    ,[req.body.email],
+    (err,result) => {
+      if(err) console.log(err)
+      else{res.json({result:result});}
+    //console.log("getUser");
     //console.log(res);
-    res.json({result:result});
+    
   })
 })
 
