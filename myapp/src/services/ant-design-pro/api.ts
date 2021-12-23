@@ -7,6 +7,7 @@ import Axios from 'axios';
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
   console.log('currentuser');
+  //return {data:body.username};
   return request<{
     data: API.CurrentUser;
   }>('/api/currentUser', {
@@ -38,14 +39,13 @@ export async function outLogin(options?: { [key: string]: any }) {
 
 export async function getUser(body: API.LoginParams) {
   console.log(body.username);
-  var resData = {};
-  await Axios.get('http://localhost:5000/getUtilizador', {
+  var email = body.username;
+  //var resData = {};
+  return request('http://localhost:5000/getUtilizador', {
+    method: 'GET',
     data: {
-      email: body.username,
+      email: email?.toString(),
     },
-  }).then((res) => {
-    resData = res.data;
-    return resData;
   });
 }
 

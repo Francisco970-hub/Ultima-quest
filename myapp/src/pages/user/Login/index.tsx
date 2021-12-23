@@ -50,6 +50,8 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
+      const userinfo = await getUser({ ...values, type });
+      console.log(userinfo);
       const msg = await login({ ...values, type });
       if (msg.status === 200) {
         const defaultLoginSuccessMessage = intl.formatMessage({
@@ -58,9 +60,6 @@ const Login: React.FC = () => {
         });
         console.log(defaultLoginSuccessMessage);
         console.log(msg);
-
-        const userInfo = await getUser({ ...values, type });
-        console.log(userInfo);
 
         //message.success(defaultLoginSuccessMessage);
         await fetchUserInfo(); //o problema começa aqui com o current user
