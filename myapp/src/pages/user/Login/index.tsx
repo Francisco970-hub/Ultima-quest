@@ -36,22 +36,22 @@ const Login: React.FC = () => {
 
   const intl = useIntl();
 
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
+  const fetchUserInfo = async (values: API.LoginParams) => {
+    const userInfo = await getUser({ ...values, type });
     console.log(userInfo);
 
     if (userInfo) {
       await setInitialState((s) => ({
         ...s,
-        currentUser: userInfo,
+        currentUser: userInfo.result[0].email,
       }));
     }
   };
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
-      const userinfo = await getUser({ ...values, type });
-      console.log(userinfo);
+      const userInfo = await getUser({ ...values, type });
+      console.log(userInfo);
       const msg = await login({ ...values, type });
       if (msg.status === 200) {
         const defaultLoginSuccessMessage = intl.formatMessage({
@@ -62,7 +62,7 @@ const Login: React.FC = () => {
         console.log(msg);
 
         //message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo(); //o problema começa aqui com o current user
+        await fetchUserInfo(values); //o problema começa aqui com o current user
         if (!history) return;
         const { query } = history.location;
         const { redirect } = query as { redirect: string };

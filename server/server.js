@@ -94,10 +94,10 @@ app.get("/getUsers", (req, res) => {
 })
 
 app.get("/getUtilizador", (req, res) => {
-  console.log(req.body.email);
+  console.log(req.query.email);
   db.query(
     "SELECT * FROM users WHERE email = ?"
-    ,[req.body.email],
+    ,[req.query.email],
     (err,result) => {
       if(err) console.log(err)
       else{res.json({result:result});}

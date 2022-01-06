@@ -38,10 +38,8 @@ export async function outLogin(options?: { [key: string]: any }) {
 }
 
 export async function getUser(body: API.LoginParams) {
-  console.log(body.username);
   var email = body.username;
-  //var resData = {};
-  return request('http://localhost:5000/getUtilizador', {
+  return request('http://localhost:5000/getUtilizador?email=' + email?.toString(), {
     method: 'GET',
     data: {
       email: email?.toString(),
